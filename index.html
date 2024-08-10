@@ -160,7 +160,7 @@
                 let resultText = `该车的最近年检时间为：${formattedNextInspectionDate}，操作：${action}`;
                 document.getElementById('result').innerHTML = resultText;
             } else {
-                document.getElementById('result').innerHTML = "年检时间大于1年，请明年再查";
+                document.getElementById('result').innerHTML = "本年度不符合年检规则，请明年再查";
             }
         }
     </script>
