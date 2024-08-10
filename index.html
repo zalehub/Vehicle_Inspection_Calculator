@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>车辆年检计算器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+      .calculator-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            font-size: 16px;
+            color: #555;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator-container">
+        <h1>车辆年检计算器</h1>
+        <form>
+            <div>
+                <label for="registrationDate">车辆登记日期：</label>
+                <input type="date" id="registrationDate">
+            </div>
+            <div>
+                <label for="vehicleType">车型：</label>
+                <select id="vehicleType">
+                    <option value="9座及以下非营运客车">9座及以下非营运客车</option>
+                    <option value="营运客车">营运客车</option>
+                    <option value="货车及大中型非营运客车">货车及大中型非营运客车</option>
+                </select>
+            </div>
+            <button type="button" onclick="calculateInspectionDate()">计算年检时间</button>
+        </form>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function calculateInspectionDate() {
+            // 获取输入的车辆登记日期和车型
+            const registrationDate = new Date(document.getElementById('registrationDate').value);
+            const vehicleType = document.getElementById('vehicleType').value;
+            const currentDate = new Date();
+            let yearsSinceRegistration = currentDate.getFullYear() - registrationDate.getFullYear();
+
+            let nextInspectionDate;
+            let action;
+
+            switch (vehicleType) {
+                case "9座及以下非营运客车":
+                    if (yearsSinceRegistration < 6) {
+                        // 6 年内每两年申领一次检验标志（免上线检测）
+                        if ((yearsSinceRegistration === 0 || (yearsSinceRegistration % 2 === 0 && yearsSinceRegistration > 0))) {
+                            nextInspectionDate = new Date(registrationDate.getFullYear() + (yearsSinceRegistration % 2 === 0? yearsSinceRegistration + 2 : yearsSinceRegistration + 1), registrationDate.getMonth(), registrationDate.getDate());
+                            action = "申请年检标";
+                        }
+                    } else if (yearsSinceRegistration === 6) {
+                        // 第 6 年上线检测
+                        nextInspectionDate = new Date(registrationDate.getFullYear() + 6, registrationDate.getMonth(), registrationDate.getDate());
+                        action = "上线检测";
+                    } else if (yearsSinceRegistration === 10) {
+                        // 第 10 年上线检测
+                        nextInspectionDate = new Date(registrationDate.getFullYear() + 10, registrationDate.getMonth(), registrationDate.getDate());
+                        action = "上线检测";
+                    } else if (yearsSinceRegistration > 10) {
+                        // 10 年以上每年上线检测
+                        nextInspectionDate = new Date(registrationDate.getFullYear() + yearsSinceRegistration + 1, registrationDate.getMonth(), registrationDate.getDate());
+                        action = "上线检测";
+                    }
+                    break;
+                case "营运客车":
+                    if (yearsSinceRegistration < 5) {
+                        // 5 年内每年上线检测
+                        nextInspectionDate = new Date(registrationDate.getFullYear() + yearsSinceRegistration + 1, registrationDate.getMonth(), registrationDate.getDate());
+                        action = "上线检测";
+                    } else {
+                        // 5 年后每 6 个月上线检测
+                        if ((yearsSinceRegistration * 12 + currentDate.getMonth() - registrationDate.getMonth()) >= 6) {
+                            nextInspectionDate = new Date(registrationDate.getFullYear() + yearsSinceRegistration + 1, registrationDate.getMonth(), registrationDate.getDate());
+                            action = "上线检测";
+                        } else {
+                            nextInspectionDate = new Date(registrationDate.getFullYear() + yearsSinceRegistration, registrationDate.getMonth() + 6, registrationDate.getDate());
+                            action = "上线检测";
+                        }
+                    }
+                    break;
+                case "货车及大中型非营运客车":
+                    if (yearsSinceRegistration < 10) {
+                        // 10 年内每年上线检测
+                        nextInspectionDate = new Date(registrationDate.getFullYear() + yearsSinceRegistration + 1, registrationDate.getMonth(), registrationDate.getDate());
+                        action = "上线检测";
+                    } else {
+                        // 10 年以上每 6 个月检测
+                        if ((yearsSinceRegistration * 12 + currentDate.getMonth() - registrationDate.getMonth()) >= 6) {
+                            nextInspectionDate = new Date(registrationDate.getFullYear() + yearsSinceRegistration + 1, registrationDate.getMonth(), registrationDate.getDate());
+                            action = "上线检测";
+                        } else {
+                            nextInspectionDate = new Date(registrationDate.getFullYear() + yearsSinceRegistration, registrationDate.getMonth() + 6, registrationDate.getDate());
+                            action = "上线检测";
+                        }
+                    }
+                    break;
+            }
+
+            if (nextInspectionDate) {
+                const formattedNextInspectionDate = nextInspectionDate.getFullYear() + '-' + ('0' + (nextInspectionDate.getMonth() + 1)).slice(-2) + '-' + ('0' + nextInspectionDate.getDate()).slice(-2);
+                let resultText = `该车的最近年检时间为：${formattedNextInspectionDate}，操作：${action}`;
+                document.getElementById('result').innerHTML = resultText;
+            } else {
+                document.getElementById('result').innerHTML = "年检时间大于1年，请明年再查";
+            }
+        }
+    </script>
+</body>
+
+</html>
